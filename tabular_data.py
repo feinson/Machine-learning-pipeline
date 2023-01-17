@@ -1,5 +1,6 @@
 import pandas as pd
 import math
+import numpy as np
 
 import time
 
@@ -30,21 +31,29 @@ def combine_description_strings(df: pd.DataFrame):
         
             return output
         except:
-            return input_string
+            return np.nan
+
+    def column_string_cleaner(sr1: pd.Series):
+        sr = sr1.copy()
+        sr.dropna(inplace=True)
+        sr = sr.apply(string_cleaner)
+        sr.dropna(inplace=True)
+
+        return sr
      
     df2 = df.copy()
-    df2.dropna(subset=["Description"], inplace=True)
-    df2["Description"] = df2["Description"].apply(string_cleaner)
+    df2["Description"] = column_string_cleaner(df2["Description"])
 
-    df2.dropna(subset=["Amenities"], inplace=True)
-    df2["Amenities"] = df2["Amenities"].apply(string_cleaner)
-        
+    df2["Amenities"] = column_string_cleaner(df2["Amenities"])  
+
     return df2
 
 def set_default_feature_values(df: pd.DataFrame):
 
     df2 = df.copy()
-    df2[["guests", "beds", "bathrooms", "bedrooms"]] = df2[["guests", "beds", "bathrooms", "bedrooms"]].fillna(value=1).astype(int)
+    cols_for_defaults = ["guests", "beds", "bathrooms", "bedrooms"]
+    df2[cols_for_defaults] = df2[cols_for_defaults].apply(pd.to_numeric, errors="coerce")
+    df2[cols_for_defaults] = df2[cols_for_defaults].fillna(value=1)
 
     return df2
 
@@ -60,10 +69,8 @@ if __name__ == "__main__":
     x = time.time()
 
     df = pd.read_csv('./data/listing.csv')
-    df.drop(index = 586, inplace=True)
 
     cleaned_tabular_data = clean_tabular_data(df)
-    print(len(cleaned_tabular_data.columns))
     cleaned_tabular_data.to_csv("./data/clean_tabular_data.csv")
 
     print("_________")
