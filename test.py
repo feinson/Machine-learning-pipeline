@@ -1,11 +1,7 @@
-class Person:
+import numpy as np
 
-    def __init__(self, age):
-        self.age = age
+np.random.seed(2)
+arr = np.random.randint(0,10,size=(9, 12))
 
-    def __str__(self):
-        return f"person's age is {self.age}"
-
-
-gill = Person(5)
-print(gill)
+print(arr)
+print([len(np.unique(arr[i])) for i in range(len(arr))])

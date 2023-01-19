@@ -53,7 +53,7 @@ def set_default_feature_values(df: pd.DataFrame):
     df2 = df.copy()
     cols_for_defaults = ["guests", "beds", "bathrooms", "bedrooms"]
     df2[cols_for_defaults] = df2[cols_for_defaults].apply(pd.to_numeric, errors="coerce")
-    df2[cols_for_defaults] = df2[cols_for_defaults].fillna(value=1)
+    df2[cols_for_defaults] = df2[cols_for_defaults].fillna(value=1).astype(int)
 
     return df2
 
@@ -65,13 +65,20 @@ def clean_tabular_data(df: pd.DataFrame):
     return df
 
 
+def load_airbnb(clean_df: pd.DataFrame, label):
+    df = clean_df.copy()
+    labels = np.array(df.pop(label))
+    features = np.array(df.select_dtypes(['number']))
+    return (features, labels)
+
 if __name__ == "__main__":
     x = time.time()
 
     df = pd.read_csv('./data/listing.csv')
 
     cleaned_tabular_data = clean_tabular_data(df)
-    cleaned_tabular_data.to_csv("./data/clean_tabular_data.csv")
+
+    cleaned_tabular_data.to_csv("./data/clean_tabular_data.csv", index=False)
 
     print("_________")
     print((time.time()-x))
