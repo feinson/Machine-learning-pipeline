@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import SGDRegressor
-from sklearn.model_selection import train_test_split
+from sklearn import model_selection
 import matplotlib.pyplot as plt
 from sklearn import metrics
 import itertools
+from joblib import dump
+import os
 
 
 def load_airbnb(clean_df: pd.DataFrame, label):
@@ -58,32 +60,58 @@ def custom_tune_regression_model_hyperparameters(model_class: type, data: dict, 
 
         if validation_RMSE < best_metrics["Validation_RMSE"]:
             best_metrics["Validation_RMSE"] = validation_RMSE
-            best_metrics["Validation R^2"] = metrics.r2_score(data["y_validation"], y_hat)
+            best_metrics["Validation_R^2"] = metrics.r2_score(data["y_validation"], y_hat)
             best_hyperparameters = attempt
 
     return best_hyperparameters, best_metrics
 
+def tune_regression_model_hyperparameters(model_class: type, data: dict, param_dict:dict):
 
+    model = model_class()
+    random_search = model_selection.GridSearchCV(estimator=model, param_grid=param_dict)
+    random_search.fit(data["X_validation"], data["y_validation"])
 
+    best_hyperparameters = random_search.best_params_
+    best_model = model_class(**random_search.best_params_)
+    best_model.fit(data["X_train"], data["y_train"])
+
+    y_hat = best_model.predict(data["X_validation"])
+    best_metrics = {"Validation_RMSE": metrics.mean_squared_error(data["y_validation"], y_hat, squared=False), "Validation_R^2": metrics.r2_score(data["y_validation"], y_hat)}
+    return best_hyperparameters, best_metrics
+
+def save_model(model, folder):
+    try:
+        os.mkdir(folder)
+    except FileExistsError:
+        pass
+    path = os.path.join(folder, "model.joblib")
+    dump(model, path)
 
 
 if __name__ == "__main__":
 
-
     np.random.seed(2)
-    clean_df = pd.read_csv('./data/clean_tabular_data.csv')
+    clean_df = pd.read_csv('.//data//clean_tabular_data.csv')
     features, labels = load_airbnb(clean_df, "Price_Night")
     data={}
     #prepearing the data...
-    data["X_train"], data["X_test"], data["y_train"], data["y_test"] = train_test_split(features, labels, test_size=0.3)
-    data["X_validation"], data["X_test"], data["y_validation"], data["y_test"] = train_test_split(data["X_test"], data["y_test"], test_size=0.5)
+    data["X_train"], data["X_test"], data["y_train"], data["y_test"] = model_selection.train_test_split(features, labels, test_size=0.3)
+    data["X_validation"], data["X_test"], data["y_validation"], data["y_test"] = model_selection.train_test_split(data["X_test"], data["y_test"], test_size=0.5)
     data["X_train"], data["X_validation"], data["X_test"] = standardise_multiple(data["X_train"], data["X_validation"], data["X_test"])
 
     data = {"X_train": data["X_train"], "X_test": data["X_test"], "X_validation": data["X_validation"], "y_train": data["y_train"], "y_test": data["y_test"], "y_validation": data["y_validation"]}
 
-
+    
     #fitting the stochastic gradient descent model
     param_dict = {"alpha": [0.00005, 0.0001, 0.0002, 0.0004], "max_iter": [250, 500, 1000]}
     best_hyperparameters, best_metrics = custom_tune_regression_model_hyperparameters(SGDRegressor, data, param_dict)
     print(best_hyperparameters)
     print(best_metrics)    
+
+    modelly = SGDRegressor(**best_hyperparameters)
+    modelly.fit(data["X_train"], data["y_train"])
+    y_hat = modelly.predict(data["X_validation"])
+    print(metrics.mean_squared_error(data["y_validation"], y_hat, squared=False))
+
+    save_model(modelly, "models\\regression\\linear_regression")
+
