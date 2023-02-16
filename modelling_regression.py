@@ -75,14 +75,7 @@ def save_all_models_and_find_best(models_and_params, data):
 if __name__ == "__main__":
 
     np.random.seed(2)
-    clean_df = pd.read_csv('.//data//clean_tabular_data.csv')
-    features, labels = load_airbnb(clean_df, label="Price_Night")
-    data={}
-    #preparing the data...
-    data["X_train"], data["X_test"], data["y_train"], data["y_test"] = model_selection.train_test_split(features, labels, test_size=0.3)
-    data["X_validation"], data["X_test"], data["y_validation"], data["y_test"] = model_selection.train_test_split(data["X_test"], data["y_test"], test_size=0.5)
-    data["X_train"], (train_mean, train_std) = standardise(data["X_train"])
-    data["X_validation"], data["X_test"] = standardise_multiple(data["X_validation"], data["X_test"], mean=train_mean, std=train_std)
+    data = prepare_data("Price_Night")
 
 
     

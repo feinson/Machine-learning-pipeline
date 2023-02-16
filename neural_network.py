@@ -40,7 +40,6 @@ class NeuralNetwork(torch.nn.Module):
 
         self.lr = hyperparams_dict["learning_rate"]                             #sets learning rate
         exec(f'self.optimiser = torch.optim.{hyperparams_dict["optimiser"]}')   #sets optimiser
-        print("used dict")
 
 
     def forward(self, x):
@@ -99,60 +98,86 @@ def custom_tune_nn_hyperparameters(data: dict, param_dict_list: list):
         keys = param_dict.keys()
         combinations = product(*param_dict.values())        #itertools product
         
-
         for attempt in (dict(zip(keys, combination)) for combination in combinations):
-
+            print(attempt)
             model = NeuralNetwork(attempt)
-            #upto
-            trained_model = train(model, train_data, num_epochs=30, print_out=True)
+            trained_model, training_duration = train(model, train_data, timed=True)
 
             with torch.no_grad():
                 trained_model.eval() # set model to evaluation mode
                 inputs = torch.tensor(data["X_validation"], dtype=torch.float32)
+
+                start_predict_time = time.time()            #training the model
                 y_hat = trained_model(inputs).numpy()
+                inference_latency = time.time() - start_predict_time
+
                 validation_RMSE = metrics.mean_squared_error(data["y_validation"], y_hat, squared=False)
+                print(f"Validation RMSE was {validation_RMSE}")
 
             if validation_RMSE < best_metrics["Validation_RMSE"]:
                 best_metrics["Validation_RMSE"] = validation_RMSE
                 best_metrics["Validation_R^2"] = metrics.r2_score(data["y_validation"], y_hat)
+                best_metrics["Training_duration"] = training_duration
+                best_metrics["Inference_latency"] = inference_latency
                 best_hyperparameters = attempt
+
+    print("_____________________________________")
+    print(f'The best model has hyperparamters given by {best_hyperparameters}. It has a Validation set RMSE of {best_metrics["Validation_RMSE"]}, and a training duration of {best_metrics["Training_duration"]}.')
 
     return best_hyperparameters, best_metrics
 
-
-
-if __name__ == "__main__":
-
-    
-    np.random.seed(2)
-    clean_df = pd.read_csv('.//data//clean_tabular_data.csv')
-    features, labels = load_airbnb(clean_df, label="Price_Night")
-    data={}
-    #preparing the data... I like to put everything in a dictionary.
-    data["X_train"], data["X_test"], data["y_train"], data["y_test"] = model_selection.train_test_split(features, labels, test_size=0.3)
-    data["X_validation"], data["X_test"], data["y_validation"], data["y_test"] = model_selection.train_test_split(data["X_test"], data["y_test"], test_size=0.5)
-    data["X_train"], (train_mean, train_std) = standardise(data["X_train"])
-    data["X_validation"], data["X_test"] = standardise_multiple(data["X_validation"], data["X_test"], mean=train_mean, std=train_std)
-
-# Create data loaders for the training, validation, and test sets
-    train_data = AirbnbDataset(data["X_train"], data["y_train"])
-    validation_data = AirbnbDataset(data["X_validation"], data["y_validation"])
+def get_yaml_for_grid_search():
 
     with open("nn_configuration_file.yaml", "r") as stream:
         try:
             p = yaml.safe_load(stream)
-            print(p)
+        except yaml.YAMLError as exc:
+            print(exc)
+        
+    return p
+
+if __name__ == "__main__":
+
+    np.random.seed(2)
+    data = prepare_data("Price_Night")
+
+    with open("nn_configuration_file.yaml", "r") as f:
+        try:
+            params_list_dicts = yaml.safe_load(f)
         except yaml.YAMLError as exc:
             print(exc)
 
-    trained_model, _ = train(NeuralNetwork(p[0]), train_data, validation_data=validation_data, num_epochs=30, print_out=True)
-    print(isinstance(trained_model, torch.nn.Module))
+    best_hyperparameters, best_metrics = custom_tune_nn_hyperparameters(data, params_list_dicts)
+
+    train_data = AirbnbDataset(data["X_train"], data["y_train"])
+    trained_model, _ = train(NeuralNetwork(best_hyperparameters), train_data)
+    
+    with torch.no_grad():
+        trained_model.eval()
+        save_model(trained_model, best_hyperparameters, best_metrics, folder=f"models{os.sep}regression{os.sep}NeuralNetworks")
+
+
+
+
+# # Create data loaders for the training, validation, and test sets
+#     train_data = AirbnbDataset(data["X_train"], data["y_train"])
+#     validation_data = AirbnbDataset(data["X_validation"], data["y_validation"])
+
+    
+#     with open("test_config.yaml", "r") as stream:
+#         try:
+#             p = yaml.safe_load(stream)
+#             print(p)
+#         except yaml.YAMLError as exc:
+#             print(exc)
+
+#     trained_model, _ = train(NeuralNetwork(p[0]), train_data, validation_data=validation_data, num_epochs=30, print_out=True)
     
 
 
-    with torch.no_grad():
-        trained_model.eval() # set model to evaluation mode
-        inputs = torch.tensor(data["X_validation"], dtype=torch.float32)
-        predictions = trained_model(inputs).numpy()
-        validation_RMSE = metrics.mean_squared_error(data["y_validation"], predictions, squared=False)
-        print(validation_RMSE)
+#     with torch.no_grad():
+#         trained_model.eval() # set model to evaluation mode
+#         inputs = torch.tensor(data["X_validation"], dtype=torch.float32)
+#         predictions = trained_model(inputs).numpy()
+#         validation_RMSE = metrics.mean_squared_error(data["y_validation"], predictions, squared=False)
+#         print(validation_RMSE)

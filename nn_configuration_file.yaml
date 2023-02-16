@@ -1,15 +1,38 @@
 - optimiser: 
+        - SGD
+  learning_rate: 
+        - 0.0001
+        - 0.0005
+  width:
+        - 8
+  depth: 
+        - 5
+        - 7
+        - 9
+- optimiser: 
           - Adam
   learning_rate: 
-          - 0.0001
-          - 0.0005
-          - 0.001
-          - 0.002
+          - 0.005
+          - 0.01
+          - 0.05
   width:
-        - 64
+        - 8
+        - 16
         - 32
-  depth: 6
-- optimiser: Adam
-  learning_rate: 0.001
-  width: 5
-  depth: 5
+        - 64
+  depth: 
+        - 7
+        - 9
+- optimiser:
+        - Adagrad
+        - Adadelta
+  learning_rate:
+        - 0.01
+        - 0.05
+        - 0.1
+  width:
+        - 16
+        - 32
+  depth: 
+        - 7
+        - 9

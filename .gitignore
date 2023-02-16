@@ -5,3 +5,5 @@ grid_search.py
 models
 .gitignore
 runs
+test_config.yaml
+__pycache__
