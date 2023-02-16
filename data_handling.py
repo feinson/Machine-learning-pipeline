@@ -4,6 +4,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import torch
+import sklearn
 
 
 def save_model(model, hyperparams, metrics, folder, name="model"):
@@ -11,15 +12,24 @@ def save_model(model, hyperparams, metrics, folder, name="model"):
         os.mkdir(folder)
     except FileExistsError:
         pass
-    model_path = os.path.join(folder, f"{name}.joblib")
+
+    if isinstance(model, torch.nn.Module):
+        model_path = os.path.join(folder, f"{name}.pt")
+        torch.save(model.state_dict(), model_path)
+    elif isinstance(model, sklearn.base.BaseEstimator):
+        model_path = os.path.join(folder, f"{name}.joblib")
+        joblib.dump(model, model_path)  #save model
+    else:
+        raise TypeError("Input model must be either an SKlearn model, or a PyTorch model.")
+
     hyperparams_path = os.path.join(folder, f"{name}_hyperparams.json")
     metrics_path = os.path.join(folder, f"{name}_metrics.json")
-    joblib.dump(model, model_path)
-    with open(hyperparams_path, 'w') as fp:
-        json.dump(hyperparams, fp)
-    with open(metrics_path, 'w') as fp:
-        json.dump(metrics, fp)
 
+    with open(hyperparams_path, 'w') as fp: #save hyperparmeters of model
+        json.dump(hyperparams, fp)
+
+    with open(metrics_path, 'w') as fp:      #save metrice of model
+        json.dump(metrics, fp)
 
 def load_airbnb(clean_df: pd.DataFrame, label):
 
