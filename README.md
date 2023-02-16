@@ -1,7 +1,7 @@
-# ai-core-airbnb
+# Machine Learning Pipeline
 
-This was a project I completed for the AiCore data science specialism course. It involves processing tabular and image data, including data cleaning in Pandas, followed by building a pipeline to train and test various machine learning models to make predictions from the data. The files ```modelling_regression.py``` and ```modelling_classification.py``` contain pipelines for testing various models from SKlearn. This works by performing a grid search to find the best hyperparameters for each model, and then comparing the different models to each other. The ```neural_network.py``` functions similarly, but this time a custom neural network is built and trained in PyTorch, according to the hyperparameters.
-Note that the image data, and tensorboard runs are gitignored.
+This was a project involves creating a pipeline for hyperparameter tuning and testing of machine learning models and neural networks. The initial data is in the form of an unclean csv file with data on AirBnB listings, as well as unprocessed images of the data. There are scripts for processing the tabular and image data, including data cleaning in Pandas. There is then a pipeline to train and test various machine learning models to make predictions from the data. The files ```modelling_regression.py``` and ```modelling_classification.py``` contain pipelines for testing various models from SKlearn. This works by performing a grid search to find the best hyperparameters for each model, and then comparing the different models to each other. The ```neural_network.py``` functions similarly, but this time a custom neural network is built and trained in PyTorch, according to the hyperparameters.
+Note that the image data, and tensorboard runs are gitignored for efficiency.
 
 ## Summary of what I have learnt
     - How to clean and wrangle data with Pandas.
