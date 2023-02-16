@@ -4,15 +4,19 @@ This was a project involves creating a pipeline for hyperparameter tuning and te
 Note that the image data, and tensorboard runs are gitignored for efficiency.
 
 ## Summary of what I have learnt
+Here is a summary for what I have learnt.
 
-    - How to clean and wrangle data with Pandas.
-    - How to process image data and tabular data to prepare it for machine learning tasks.
-    - How to use SKlearn to train and test various machine learning models. I also have a good understanding of how models like random forests and decision trees work under the hood, although this is not neccesary for the project.
-    - How to perform a grid search to tune hyperparmeters.
-    - How to create and configure a neural network using PyTorch.
-    - How to track the training of machine learning models using tensorboard.
+* How to clean and wrangle data with Pandas.
+* How to process image data and tabular data to prepare it for machine learning tasks.
+* How to use SKlearn to train and test various machine learning models. I also have a good understanding of how models like random forests and decision trees work under the hood, although this is not neccesary for the project.
+* How to perform a grid search to tune hyperparmeters.
+* How to create and configure a neural network using PyTorch.
+* How to track the training of machine learning models using tensorboard.
+
+    
 
  Individually the scripts function as follows.
+
 ## ```tabular_data.py```
 This script loads in the unclean data as a csv file, and uses Pandas to fix problems with the data and saves the cleaned data as another csv. A .py file is used, but in a real-world situation a Jupyter notebook would be preferable, so that the data doesn't have to be loaded every time
 
