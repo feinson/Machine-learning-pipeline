@@ -1,9 +1,12 @@
-data
+data/images
+all_processed_images
+runs
+
 testl.py
 testl2.py
-grid_search.py
-models
-.gitignore
-runs
+
+
+
+
 test_config.yaml
 __pycache__

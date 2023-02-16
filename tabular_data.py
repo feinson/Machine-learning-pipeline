@@ -67,7 +67,7 @@ def clean_tabular_data(df: pd.DataFrame):
 if __name__ == "__main__":
     x = time.time()
 
-    df = pd.read_csv('./data/listing.csv')
+    df = pd.read_csv('./data/unclean_tabular_data.csv')
 
     cleaned_tabular_data = clean_tabular_data(df)
 

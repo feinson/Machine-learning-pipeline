@@ -14,7 +14,7 @@ def resize_image(img, fixed_height):
 #first for loop is to determine the smallest height
 if __name__ == "__main__":
     x = time.time()
-    processed_images_path = "./data/processed_images"
+    processed_images_path = "./data/all_processed_images"
 
     try:
         os.mkdir(processed_images_path)

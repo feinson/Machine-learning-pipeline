@@ -52,7 +52,7 @@ def custom_tune_regression_model_hyperparameters(model_class: type, data: dict, 
 
     return best_hyperparameters, best_metrics
 
-def save_all_models_and_find_best(models_and_params, data):
+def save_all_models_and_find_best(models_and_params, data, save_best_model=True):
     overall_best_RMSE = float("inf")
 
     for model_pair in models_and_params.items():
@@ -66,10 +66,12 @@ def save_all_models_and_find_best(models_and_params, data):
         print(f"{model_pair[0].__name__}:", best_hyperparameters, best_metrics)
         the_model = model_pair[0](**best_hyperparameters)
         the_model.fit(data["X_train"], data["y_train"])
-        save_model(the_model, hyperparams=best_hyperparameters, metrics=best_metrics, folder=f"models{os.sep}regression{os.sep}{model_pair[0].__name__[:-9]}")
+        if save_best_model == True:
+            save_model(the_model, hyperparams=best_hyperparameters, metrics=best_metrics, folder=f"models{os.sep}regression{os.sep}{model_pair[0].__name__[:-9]}")
     
     print("_____________________________________")
     print(f"The best model is {overall_best_model_name} with hyperparamters given by {overall_best_hyperparameters}. It has a Validation set RMSE of {overall_best_RMSE}.")
+    return overall_best_model_name, overall_best_hyperparameters, overall_best_RMSE
     
 
 if __name__ == "__main__":

@@ -1,0 +1,1 @@
+{"loss": "epsilon_insensitive", "penalty": "l1", "alpha": 0.0001, "max_iter": 2500, "learning_rate": "optimal"}
