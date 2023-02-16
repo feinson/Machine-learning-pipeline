@@ -4,6 +4,7 @@ This was a project involves creating a pipeline for hyperparameter tuning and te
 Note that the image data, and tensorboard runs are gitignored for efficiency.
 
 ## Summary of what I have learnt
+
     - How to clean and wrangle data with Pandas.
     - How to process image data and tabular data to prepare it for machine learning tasks.
     - How to use SKlearn to train and test various machine learning models. I also have a good understanding of how models like random forests and decision trees work under the hood, although this is not neccesary for the project.
