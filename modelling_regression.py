@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 #Import other useful
 from sklearn import metrics
-from sklearn import model_selection
 import itertools
 import os
 
