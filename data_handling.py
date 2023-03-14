@@ -9,6 +9,10 @@ from sklearn import model_selection
 
 
 def save_model(model, hyperparams, metrics, folder, name="model"):
+    """
+    General function for saving models for use later. The function detects whether this is an SKLearn model,
+    or a PyTorch model. If it is a PyTorch model, it is the state dict that is saved.
+    """
     try:
         os.mkdir(folder)
     except FileExistsError:
@@ -33,6 +37,10 @@ def save_model(model, hyperparams, metrics, folder, name="model"):
         json.dump(metrics, fp)
 
 def load_airbnb(clean_df: pd.DataFrame, label):
+    """
+    This function takes in the Pandas datframe, in our case the one containing the cleaned AirBnB data, and returns
+    numpy arrays for the features and labels.
+    """
 
     df = clean_df.copy()
     labels = np.array(df.pop(label))
@@ -45,6 +53,9 @@ def load_airbnb(clean_df: pd.DataFrame, label):
 
 
 def standardise(dataset, mean=None, std=None):
+    """
+    Standardises a dataset.
+    """
     if mean is None and std is None:
         mean, std = np.mean(dataset, axis=0), np.std(dataset, axis=0)  # get mean and standard deviation of dataset
     standardised_dataset = (dataset - mean) / std

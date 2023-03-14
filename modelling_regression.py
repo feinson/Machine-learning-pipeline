@@ -21,6 +21,10 @@ from data_handling import *
 
 
 def plot_predictions(y_pred, y_true):
+    """
+    It creates a simple plot of the predicted values, vs the true values.
+    """
+
     samples = len(y_pred)
     plt.figure()
     plt.scatter(np.arange(samples), y_pred, c='r', label='predictions')
@@ -35,14 +39,14 @@ def custom_tune_regression_model_hyperparameters(model_class: type, data: dict, 
     best_metrics = {"Validation_RMSE":float("inf")}
     for param_dict in param_dict_list:
         keys = param_dict.keys()
-        combinations = itertools.product(*param_dict.values())
+        combinations = itertools.product(*param_dict.values()) # Generate all possible combiations for the grid search.
         
 
         for attempt in (dict(zip(keys, combination)) for combination in combinations):
 
             model = model_class(**attempt)
             model.fit(data["X_train"], data["y_train"])
-            y_hat =  model.predict(data["X_validation"])
+            y_hat = model.predict(data["X_validation"])
             validation_RMSE = metrics.mean_squared_error(data["y_validation"], y_hat, squared=False)
 
             if validation_RMSE < best_metrics["Validation_RMSE"]:

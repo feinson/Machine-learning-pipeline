@@ -4,22 +4,25 @@ import numpy as np
 
 import time
 
-def remove_columns_with_lots_of_nans(df1: pd.DataFrame, prop=0.4):
+def remove_columns_with_lots_of_nans(dataframe: pd.DataFrame, prop=0.4):
 
     #prop is the proportion of elements in the column which must not non-null for that column to survive
-    df = df1.copy()
+    df = dataframe.copy()
     df.dropna(axis="columns", thresh=math.floor(len(df.index)*prop), inplace= True)
     return df
 
-def remove_rows_with_missing_ratings(df1: pd.DataFrame):
+def remove_rows_with_missing_ratings(dataframe: pd.DataFrame):
 
-    df = df1.copy()
+    df = dataframe.copy()
     rating_columns = [item for item in df.columns if item.endswith("_rating")]
     df = df.dropna(subset=rating_columns)
 
     return df
 
-def combine_description_strings(df1: pd.DataFrame):
+def combine_description_strings(dataframe: pd.DataFrame):
+    """
+    The description and amenities columns in the tabular data are formatted horrendously. This function should fix them.
+    """
 
     def string_cleaner(input_string: str):
 
@@ -32,16 +35,11 @@ def combine_description_strings(df1: pd.DataFrame):
             return output
         except:
             return np.nan
-
-    def column_string_cleaner(sr1: pd.Series):
-        sr = sr1.copy()
-        sr = sr.apply(string_cleaner)
-        return sr
      
-    df = df1.copy()
-    df["Description"] = column_string_cleaner(df["Description"])
+    df = dataframe.copy()
+    df["Description"] = df["Description"].apply(string_cleaner)
     df = df.dropna(subset=["Description"])
-    df["Amenities"] = column_string_cleaner(df["Amenities"])
+    df["Amenities"] = df["Amenities"].apply(string_cleaner)
     df = df.dropna(subset=["Amenities"])
 
     return df
@@ -56,6 +54,9 @@ def set_default_feature_values(df1: pd.DataFrame):
     return df
 
 def clean_tabular_data(df: pd.DataFrame):
+    """
+    Applies all the above functions to clean the tabular data
+    """
     df = remove_columns_with_lots_of_nans(df)
     df = remove_rows_with_missing_ratings(df)
     df = combine_description_strings(df)

@@ -1,1 +1,1 @@
-{"optimiser": "Adam", "learning_rate": 0.05, "width": 8, "depth": 7}
+{"optimiser": "Adagrad", "learning_rate": 0.1, "width": 32, "depth": 7}

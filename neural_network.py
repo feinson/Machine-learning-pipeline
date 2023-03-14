@@ -9,7 +9,6 @@ from data_handling import *
 from itertools import count, product
 import time
 
-from sklearn import model_selection
 from sklearn import metrics
 
 class AirbnbDataset(Dataset):
@@ -33,13 +32,15 @@ class NeuralNetwork(torch.nn.Module):
         width, depth = hyperparams_dict["width"], hyperparams_dict["depth"]
         n_hidden = (depth - 2)
 
-        self.layers = torch.nn.Sequential(torch.nn.Linear(11, width),           #creates a neural network based on the width and depth
+        self.layers = torch.nn.Sequential(
+        torch.nn.Linear(11, width),                                             #creates a neural network based on the width and depth
         *(torch.nn.ReLU(), torch.nn.Linear(width, width))*(n_hidden//2),        #tuple unpacking is used to create the desried number of layers
         *(torch.nn.ReLU(),)*(n_hidden%2),
-        torch.nn.Linear(width, 1))
+        torch.nn.Linear(width, 1)
+        )
 
         self.lr = hyperparams_dict["learning_rate"]                             #sets learning rate
-        exec(f'self.optimiser = torch.optim.{hyperparams_dict["optimiser"]}')   #sets optimiser
+        self.optimiser = eval(f'torch.optim.{hyperparams_dict["optimiser"]}')   #sets optimiser
 
 
     def forward(self, x):
@@ -159,25 +160,3 @@ if __name__ == "__main__":
 
 
 
-# # Create data loaders for the training, validation, and test sets
-#     train_data = AirbnbDataset(data["X_train"], data["y_train"])
-#     validation_data = AirbnbDataset(data["X_validation"], data["y_validation"])
-
-    
-#     with open("test_config.yaml", "r") as stream:
-#         try:
-#             p = yaml.safe_load(stream)
-#             print(p)
-#         except yaml.YAMLError as exc:
-#             print(exc)
-
-#     trained_model, _ = train(NeuralNetwork(p[0]), train_data, validation_data=validation_data, num_epochs=30, print_out=True)
-    
-
-
-#     with torch.no_grad():
-#         trained_model.eval() # set model to evaluation mode
-#         inputs = torch.tensor(data["X_validation"], dtype=torch.float32)
-#         predictions = trained_model(inputs).numpy()
-#         validation_RMSE = metrics.mean_squared_error(data["y_validation"], predictions, squared=False)
-#         print(validation_RMSE)
